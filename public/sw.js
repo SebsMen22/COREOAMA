@@ -1,6 +1,8 @@
 // Service worker de COREOAMA: guarda la app en el dispositivo para que abra sin internet.
 // Los datos (coreografías) NO están aquí: viven en IndexedDB y nunca se borran al actualizar.
-const CACHE = 'coreoama-app-v1'
+const CACHE = 'coreoama-app-v2'
+// Solo se guardan archivos de la app, fuentes y el SDK de Firebase (nunca las llamadas a la base de datos)
+const CACHEABLE = [self.location.origin, 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://www.gstatic.com']
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png']
 
 self.addEventListener('install', (e) => {
@@ -22,6 +24,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request
   if (req.method !== 'GET') return
+  if (!CACHEABLE.includes(new URL(req.url).origin)) return
   // Páginas: primero internet (para recibir actualizaciones), si no hay, la copia guardada
   if (req.mode === 'navigate') {
     e.respondWith(

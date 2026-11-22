@@ -9,6 +9,7 @@ import { GridDefs, StageBase, Scene, Mini, arrowCtrl } from './StageArt.jsx'
 import { Roster, FormationPanel, Inspector, GroupForm } from './Panels.jsx'
 import Timeline from './Timeline.jsx'
 import { Modal, Confirm } from './Modal.jsx'
+import { SyncIcon } from './Account.jsx'
 import { listBackups, addBackup, putAudio, getAudio, download, slug, exportJSON } from '../storage.js'
 
 const TOOLS = [
@@ -17,7 +18,7 @@ const TOOLS = [
   ['circle', 'Círculo', LuCircleDashed], ['triangle', 'Triángulo', LuTriangle], ['text', 'Texto', LuType],
 ]
 
-export default function Editor({ initial, onSave, onBack, onHelp, onDuplicateCoreo, toast }) {
+export default function Editor({ sync, initial, onSave, onBack, onHelp, onDuplicateCoreo, toast }) {
   const [c, setC] = useState(initial)
   const cRef = useRef(initial)
   const hist = useRef([]), fut = useRef([])
@@ -245,6 +246,7 @@ export default function Editor({ initial, onSave, onBack, onHelp, onDuplicateCor
         <input className="ed-title" value={c.nombre} aria-label="Nombre de la coreografía"
           onChange={(e) => { recordOnce('nombre'); const v = e.target.value; apply((n) => { n.nombre = v }, false) }} />
         <span className={'saved' + (saved ? ' ok' : '')} title={saved ? 'Todo está guardado en este dispositivo' : 'Guardando…'}>{saved ? <><LuCheck /> <i>Guardado</i></> : <><LuLoader className="spin" /> <i>Guardando</i></>}</span>
+        {sync?.user && <span className="ed-sync" title={{ ok: 'Sincronizado', syncing: 'Sincronizando…', offline: 'Sin internet: se sincroniza al volver', error: 'No se pudo sincronizar' }[sync.status] || ''}><SyncIcon status={sync.status} /></span>}
         <div className="sp" />
         <button className="icon-btn" onClick={undo} disabled={!hist.current.length} aria-label="Deshacer" title="Deshacer (Ctrl+Z)"><LuUndo2 /></button>
         <button className="icon-btn" onClick={redo} disabled={!fut.current.length} aria-label="Rehacer" title="Rehacer (Ctrl+Y)"><LuRedo2 /></button>

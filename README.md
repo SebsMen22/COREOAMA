@@ -9,6 +9,7 @@ App para **crear, editar y ensayar coreografías de baile**, pensada a partir de
 - ⏱️ **Línea de tiempo** con duración y transición de cada formación, reproducción animada y **música**.
 - 📝 **Guía, conteos y notas** en cada formación y en la coreografía.
 - 💾 **Nada se borra**: autoguardado, deshacer, historial de copias, papelera, almacenamiento permanente y respaldo en archivo.
+- ☁️ **Sincronización entre PC y celular** con tu cuenta de Google (Firebase), y funciona sin internet.
 - 📱💻 **App instalable** (PWA) en computador, Android e iPhone; funciona **sin internet**.
 - 🖨️ Impresión / PDF con el formato del cuaderno.
 
@@ -21,6 +22,7 @@ App para **crear, editar y ensayar coreografías de baile**, pensada a partir de
 - [React 19](https://react.dev) + [Vite](https://vite.dev)
 - [react-icons](https://react-icons.github.io/react-icons/) (Lucide)
 - IndexedDB para guardar las coreografías y la música en el dispositivo
+- Firebase (Authentication con Google + Cloud Firestore) para sincronizar — se carga desde el CDN oficial, sin instalar nada. Configuración en `src/firebase-config.js`, lógica en `src/sync.js`
 - Service worker + manifest para instalarla y usarla sin conexión
 - GitHub Pages para publicarla
 
@@ -32,6 +34,8 @@ COREOAMA/
 │  ├─ App.jsx              navegación, instalación, importar/exportar
 │  ├─ model.js             datos, formaciones automáticas, línea de tiempo, ejemplos
 │  ├─ storage.js           guardado permanente (IndexedDB, historial, papelera)
+│  ├─ sync.js              sincronización con Firebase
+│  ├─ firebase-config.js   datos públicos del proyecto Firebase
 │  ├─ styles.css           diseño claro con morado
 │  └─ components/
 │     ├─ Home.jsx          “Tus coreos” y papelera
@@ -43,6 +47,21 @@ COREOAMA/
 │     └─ Modal.jsx
 ├─ docs/                  app compilada que publica GitHub Pages
 └─ setup/deploy.yml       (opcional) publicación automática con GitHub Actions
+```
+
+## Reglas de Firestore
+
+En Firebase → Firestore Database → Reglas:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /usuarios/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
 ```
 
 ## Correr en tu computador (desarrollo)
@@ -79,7 +98,6 @@ Las actualizaciones llegan solas a quien tenga la app instalada (al abrirla con 
 
 ## Ideas para siguientes versiones
 
-- Sincronizar entre dispositivos con una cuenta (Supabase / Firebase).
 - Compartir una coreografía con un enlace de solo lectura para los alumnos.
 - Vista 3D y exportar la reproducción como video.
 - Versión de escritorio empaquetada (.exe) con Tauri o Electron.

@@ -116,7 +116,17 @@ COREOAMA está hecha para **no borrar nada**:
 5. **Almacenamiento permanente**: la app le pide al navegador que no limpie sus datos.
 6. **Respaldo en archivo**: en el inicio, **Respaldo de todo** descarga un archivo `.json` con todas las coreos. Guárdalo en Drive, USB o correo. Con **Importar** lo recuperas.
 
-> ⚠️ Las coreografías viven **en cada dispositivo**. Para pasar una coreo del computador al celular: **Exportar** en uno → enviar el archivo (WhatsApp, Drive, correo) → **Importar** en el otro.
+7. **Sincronización en la nube** (ver abajo): con sesión iniciada, cada coreo también queda guardada en tu cuenta.
+
+### Sincronizar el computador y el celular
+1. En la pantalla de inicio toca **Sincronizar** (arriba a la derecha) y entra con tu **cuenta de Google**.
+2. Haz lo mismo en el otro dispositivo **con la misma cuenta**.
+3. Listo: lo que cambies en uno aparece en el otro en segundos. El ícono de nube muestra el estado: ☁️ verde = sincronizado, 🔄 = sincronizando, nube tachada = sin internet (se sube solo cuando vuelve la conexión).
+
+- La app sigue funcionando **sin internet**; los cambios se suben después.
+- Si cambias la misma coreo en los dos dispositivos sin conexión, queda la versión más reciente y la otra se guarda en el **Historial de copias**.
+- La **música** no se sube a la nube: agrégala en cada dispositivo.
+- Sin sesión iniciada también puedes pasar coreos con **Exportar** → enviar el archivo → **Importar**.
 > ⚠️ No borres los “datos de navegación / datos del sitio” de COREOAMA en el navegador sin haber hecho antes un respaldo.
 
 ---

@@ -133,6 +133,23 @@ input[type=checkbox] { width: 18px; height: 18px; min-height: 0; accent-color: v
 .safe { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 14px; flex: 1 1 320px }
 .safe svg { color: #16a34a; flex: none; width: 20px; height: 20px }
 
+/* cuenta y sincronización */
+.acc-btn { gap: 8px; border-radius: 999px; padding: 6px 14px 6px 10px; color: var(--pri-d); border-color: var(--pri-l) }
+.acc-btn.on { padding: 4px 10px 4px 4px; background: #fff }
+.acc-btn img, .acc-ini { width: 32px; height: 32px; border-radius: 50%; object-fit: cover }
+.acc-ini { display: grid; place-items: center; background: var(--pri); color: #fff; font-weight: 800 }
+.acc-ini.big, .acc-card img { width: 48px; height: 48px; font-size: 20px }
+.acc-card { display: flex; gap: 12px; align-items: center; padding: 6px 0 }
+.acc-card div { display: flex; flex-direction: column }
+.acc-card small { color: var(--muted) }
+.acc-status { display: flex; align-items: center; gap: 8px; font-weight: 700; padding: 10px 12px; border-radius: 12px; background: var(--pri-s) }
+.sync-ic { width: 18px; height: 18px; flex: none }
+.sync-ic.ok { color: #16a34a }
+.sync-ic.err { color: var(--danger) }
+.sync-ic.off { color: var(--muted) }
+.sync-ic.spin, .acc-btn .spin { color: var(--pri) }
+.ed-sync { display: inline-flex; margin-left: 6px }
+
 /* ---------------- Editor ---------------- */
 .ed { height: 100vh; height: 100dvh; display: flex; flex-direction: column }
 .ed-top { display: flex; align-items: center; gap: 4px; padding: 8px 10px; padding-top: max(8px, env(safe-area-inset-top)); background: #fff; border-bottom: 1px solid var(--line); position: relative; z-index: 30 }

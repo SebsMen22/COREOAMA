@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { LuPlus, LuSearch, LuTrash2, LuCopy, LuDownload, LuUpload, LuArchiveRestore, LuCircleHelp, LuMonitorSmartphone, LuShieldCheck, LuEllipsisVertical, LuUsers, LuLayers } from 'react-icons/lu'
 import { Mini } from './StageArt.jsx'
 import { Modal, Confirm } from './Modal.jsx'
+import Account from './Account.jsx'
 import { timeAgo, fmtTime, totalTime } from '../model.js'
 
 export function Logo({ size = 34 }) {
@@ -15,7 +16,7 @@ export function Logo({ size = 34 }) {
   )
 }
 
-export default function Home({ coreos, onOpen, onCreate, onDuplicate, onTrash, onRestore, onImport, onExportAll, onHelp, install, persisted, toast }) {
+export default function Home({ sync, coreos, onOpen, onCreate, onDuplicate, onTrash, onRestore, onImport, onExportAll, onHelp, install, persisted, toast }) {
   const [tab, setTab] = useState('activas')
   const [q, setQ] = useState('')
   const [menu, setMenu] = useState(null)
@@ -31,6 +32,7 @@ export default function Home({ coreos, onOpen, onCreate, onDuplicate, onTrash, o
         <div className="brand"><Logo /><b>COREOAMA</b></div>
         <div className="sp" />
         {install && <button onClick={install}><LuMonitorSmartphone /> <span className="hide-xs">Instalar app</span></button>}
+        <Account sync={sync} toast={toast} />
         <button className="icon-btn" onClick={onHelp} aria-label="Tutorial" title="Tutorial"><LuCircleHelp /></button>
       </header>
 
@@ -83,7 +85,7 @@ export default function Home({ coreos, onOpen, onCreate, onDuplicate, onTrash, o
       </div>
 
       <footer className="home-foot">
-        <div className="safe"><LuShieldCheck /> {persisted ? 'Almacenamiento permanente activado en este dispositivo.' : 'Todo se guarda automáticamente en este dispositivo.'} Haz un respaldo de vez en cuando.</div>
+        <div className="safe"><LuShieldCheck /> {persisted ? 'Almacenamiento permanente activado en este dispositivo.' : 'Todo se guarda automáticamente en este dispositivo.'} {sync?.user ? 'Sincronizado con tu cuenta de Google.' : 'Toca “Sincronizar” para tenerlo también en tus otros dispositivos.'}</div>
         <div className="row-wrap">
           <button onClick={() => onExportAll(active.concat(trash))}><LuDownload /> Respaldo de todo</button>
           <button onClick={() => fileRef.current.click()}><LuUpload /> Importar</button>

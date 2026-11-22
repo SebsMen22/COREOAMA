@@ -5,6 +5,7 @@ import Tutorial from './components/Tutorial.jsx'
 import { Modal, Toast } from './components/Modal.jsx'
 import { loadAll, saveCoreo, requestPersistence, isPersisted, exportJSON, parseImport, download, addBackup } from './storage.js'
 import { samples, newCoreo, clone, uid } from './model.js'
+import { startSync, pushCoreo, onSyncState } from './sync.js'
 
 const FIRST_RUN = 'coreoama-tutorial-visto'
 
@@ -17,6 +18,12 @@ export default function App() {
   const [iosHelp, setIosHelp] = useState(false)
   const [persisted, setPersisted] = useState(false)
   const tt = useRef(0)
+  const coreosRef = useRef([])
+  const openRef = useRef(null)
+  const [rev, setRev] = useState(0)
+  const [sync, setSync] = useState({ status: 'off' })
+  coreosRef.current = coreos || []
+  openRef.current = openId
 
   const toast = (t) => { setToastText(t); clearTimeout(tt.current); tt.current = setTimeout(() => setToastText(''), 2800) }
 
@@ -25,6 +32,16 @@ export default function App() {
       let list = await loadAll()
       if (!list.length) { list = samples(); for (const c of list) await saveCoreo(c) }
       setCoreos(list)
+      coreosRef.current = list
+      startSync({
+        getLocal: () => coreosRef.current,
+        applyRemote: async (remote, unsent) => {
+          if (unsent) await addBackup(unsent, 'Versión de este dispositivo (antes de sincronizar)')
+          await saveCoreo(remote)
+          setCoreos((l) => { const i = l.findIndex((x) => x.id === remote.id); const n = i < 0 ? [...l, remote] : l.slice(); if (i >= 0) n[i] = remote; coreosRef.current = n; return n })
+          if (openRef.current === remote.id) { setRev((r) => r + 1); toast('Actualizada desde otro dispositivo') }
+        },
+      })
       await requestPersistence()
       setPersisted(await isPersisted())
       try { if (!localStorage.getItem(FIRST_RUN)) { setHelp(true); localStorage.setItem(FIRST_RUN, '1') } } catch { }
@@ -32,14 +49,16 @@ export default function App() {
     const bip = (e) => { e.preventDefault(); setInstallEvt(e) }
     window.addEventListener('beforeinstallprompt', bip)
     window.addEventListener('appinstalled', () => setInstallEvt(null))
+    const offSync = onSyncState(setSync)
     const pop = () => setOpenId(null)
     window.addEventListener('popstate', pop)
-    return () => { window.removeEventListener('beforeinstallprompt', bip); window.removeEventListener('popstate', pop) }
+    return () => { offSync(); window.removeEventListener('beforeinstallprompt', bip); window.removeEventListener('popstate', pop) }
   }, [])
 
   const upsert = async (c) => {
     await saveCoreo(c)
-    setCoreos((l) => { const i = l.findIndex((x) => x.id === c.id); if (i < 0) return [...l, c]; const n = l.slice(); n[i] = c; return n })
+    setCoreos((l) => { const i = l.findIndex((x) => x.id === c.id); const n = i < 0 ? [...l, c] : l.slice(); if (i >= 0) n[i] = c; coreosRef.current = n; return n })
+    pushCoreo(c)
   }
   const open = (id) => { setOpenId(id); try { history.pushState({ coreo: id }, '') } catch { } }
   const close = () => { setOpenId(null); try { if (history.state?.coreo) history.back() } catch { } }
@@ -54,10 +73,10 @@ export default function App() {
   return (
     <>
       {current ? (
-        <Editor key={current.id} initial={current} onSave={upsert} onBack={close} onHelp={() => setHelp(true)} toast={toast}
+        <Editor key={current.id + ':' + rev} initial={current} sync={sync} onSave={upsert} onBack={close} onHelp={() => setHelp(true)} toast={toast}
           onDuplicateCoreo={async (c) => { const n = clone(c); n.id = uid(); n.nombre += ' (copia)'; n.createdAt = n.updatedAt = Date.now(); await upsert(n); toast('Copia creada en Tus coreos') }} />
       ) : (
-        <Home coreos={coreos} persisted={persisted} install={install} toast={toast} onHelp={() => setHelp(true)}
+        <Home coreos={coreos} persisted={persisted} sync={sync} install={install} toast={toast} onHelp={() => setHelp(true)}
           onOpen={open}
           onCreate={async (nombre, descripcion) => { const c = newCoreo(nombre); c.descripcion = descripcion; await upsert(c); open(c.id) }}
           onDuplicate={async (c) => { const n = clone(c); n.id = uid(); n.nombre += ' (copia)'; n.createdAt = n.updatedAt = Date.now(); await upsert(n); toast('Coreografía duplicada') }}
